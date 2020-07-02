@@ -39,7 +39,6 @@
 
 #define DEFAULT_SCREEN_TIMEOUT  30*1000
 
-int counter = 0;
 EventGroupHandle_t isr_group = NULL;
 EventGroupHandle_t g_event_group = NULL;
 
@@ -57,11 +56,8 @@ std::map<std::string, unsigned long> seenNotifiers;
 */
 void onNewNotifierFound() {
   Serial.println("BEEP");
-  counter = counter + 1;
-  ttgo->tft->setTextColor(TFT_WHITE);
-  ttgo->tft->fillRect(98, 100, 120, 40, TFT_BLACK);
-  ttgo->tft->setCursor(80, 100);
-  ttgo->tft->print("BCount:"); ttgo->tft->println(counter);
+
+  
 
   //DO SHOW DISPLAY
 
@@ -200,19 +196,32 @@ void low_energy()
   if (ttgo->bl->isOn()) {
     xEventGroupSetBits(isr_group, WATCH_FLAG_SLEEP_MODE);
     ttgo->closeBL();
-
-
-
-  } else {
+    ttgo->displayOff();
+    ttgo->tft->fillScreen(TFT_BLACK);
+  
+    } else {
 
     ttgo->openBL();
+    ttgo->displayWakeup();
+
+    ttgo->tft->fillScreen(TFT_BLACK);
+    ttgo->tft->drawString("Covid19 Beacons",  25, 50, 4);
+    ttgo->tft->setTextFont(4);
+    ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
   }
 }
 
 
-void SetBatPercentage()
+void FillDisplay()
 {
 
+  ttgo->tft->setTextColor(TFT_WHITE);
+  ttgo->tft->fillRect(98, 100, 120, 40, TFT_BLACK);
+  ttgo->tft->setCursor(80, 100);
+  ttgo->tft->print("Beac: "); ttgo->tft->println(seenNotifiers.size());
+  
+  
+  
   int BatPet = ttgo->power->getBattPercentage();
   
   ttgo->tft->fillRect(98, 150, 70, 85, TFT_BLACK);
@@ -228,7 +237,6 @@ void SetBatPercentage()
   }
   
   ttgo->tft->print("Bat: "); ttgo->tft->print(BatPet); ttgo->tft->println("%"); 
-
 }
 
 void loop() {
@@ -297,5 +305,5 @@ void loop() {
 
   Serial.printf("Count: %d \r\n", seenNotifiers.size());
   
-  SetBatPercentage();
+  FillDisplay();
 }
