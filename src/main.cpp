@@ -58,8 +58,8 @@ std::map<std::string, unsigned long> seenNotifiers;
 void onNewNotifierFound() {
   Serial.println("BEEP");
   counter = counter + 1;
-
-  ttgo->tft->fillRect(98, 100, 70, 85, TFT_BLACK);
+  ttgo->tft->setTextColor(TFT_WHITE);
+  ttgo->tft->fillRect(98, 100, 120, 40, TFT_BLACK);
   ttgo->tft->setCursor(80, 100);
   ttgo->tft->print("BCount:"); ttgo->tft->println(counter);
 
@@ -209,6 +209,28 @@ void low_energy()
   }
 }
 
+
+void SetBatPercentage()
+{
+
+  int BatPet = ttgo->power->getBattPercentage();
+  
+  ttgo->tft->fillRect(98, 150, 70, 85, TFT_BLACK);
+  ttgo->tft->setCursor(80, 150);
+
+  if(BatPet > 25)
+  {
+    ttgo->tft->setTextColor(TFT_GREEN);
+  }
+  else
+  {
+    ttgo->tft->setTextColor(TFT_RED);
+  }
+  
+  ttgo->tft->print("Bat: "); ttgo->tft->print(BatPet); ttgo->tft->println("%"); 
+
+}
+
 void loop() {
   bool  rlst;
   uint8_t data;
@@ -274,4 +296,6 @@ void loop() {
   forgetOldNotifiers();
 
   Serial.printf("Count: %d \r\n", seenNotifiers.size());
+  
+  SetBatPercentage();
 }
